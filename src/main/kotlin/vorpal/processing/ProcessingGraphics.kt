@@ -1,6 +1,6 @@
 package vorpal.processing
 
-import vorpal.processing.ProcessingMath as pm
+import vorpal.processing.ProcessingRandom as pr
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
@@ -10,8 +10,16 @@ class ProcessingGraphics(private val gc: GraphicsContext) {
         gc.fill = Color.grayRgb(gray, alpha / 255.0)
     }
 
+    fun stroke(color: Color) {
+        gc.stroke = color
+    }
+
     fun stroke(gray: Int, alpha: Int = 255) {
         gc.stroke = Color.grayRgb(gray, alpha / 255.0)
+    }
+
+    fun strokeWeight(weight: Double) {
+        gc.lineWidth = weight
     }
 
     fun ellipse(x: Double, y: Double, width: Double, height: Double) {
@@ -33,6 +41,6 @@ class ProcessingGraphics(private val gc: GraphicsContext) {
 
     companion object {
         fun randomColor(): Color =
-            Color.rgb(pm.randomInt(0xFF), pm.randomInt(0xFF), pm.randomInt(0xFF))
+            Color.rgb(pr.randomInt(0xFF), pr.randomInt(0xFF), pr.randomInt(0xFF))
     }
 }

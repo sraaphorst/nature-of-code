@@ -1,5 +1,6 @@
 package vorpal.processing
 
+import javafx.animation.AnimationTimer
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
@@ -27,6 +28,7 @@ abstract class ProcessingApp: Application() {
     }
 
     override fun start(stage: Stage) {
+        this.stage = stage
         val pane = Pane()
         pane.children.add(canvas)
         val scene = Scene(pane)
@@ -35,8 +37,16 @@ abstract class ProcessingApp: Application() {
         stage.scene = scene
         stage.show()
 
-        // Call the drawing logic.
-        draw(gc)
+        // Create the AnimationTimer for continuous drawing
+        val timer = object : AnimationTimer() {
+            override fun handle(now: Long) {
+                // Call the draw method in each frame
+                draw(gc)
+            }
+        }
+
+        // Start the timer
+        timer.start()
     }
 
     abstract fun draw(gc: ProcessingGraphics)
