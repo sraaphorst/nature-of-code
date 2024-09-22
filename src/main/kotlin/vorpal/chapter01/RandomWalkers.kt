@@ -2,10 +2,9 @@ package org.vorpal.vorpal.chapter01
 
 import javafx.application.Application
 import javafx.scene.paint.Color
-import vorpal.processing.ProcessingApp
+import javafx.stage.Stage
+
 import vorpal.processing.ProcessingGraphics as pg
-import vorpal.processing.height
-import vorpal.processing.width
 import vorpal.processing.ProcessingRandom as pr
 import vorpal.processing.ProcessingVector as pv
 import vorpal.processing.*
@@ -41,13 +40,16 @@ data class Walker(val color: Color = pg.randomColor(),
     }
 }
 
-class RandomWalkers(numWalkers: Int = 6): ProcessingApp() {
-    init {
-        createCanvas(1048.0, 512.0)
-//        setTitle("Random Walkers")
-    }
+class RandomWalkers(val numWalkers: Int = 6): ProcessingApp() {
+    private var walkers: List<Walker> = emptyList()
 
-    private val walkers = (1..numWalkers).map { Walker() }
+    override fun start(stage: Stage) {
+        // For now, we need to create the Canvas and call the superclass start to initialize the stage.
+        createCanvas(1048.0, 512.0)
+        super.start(stage)
+        setTitle("Random Walkers")
+        walkers = (1..numWalkers).map { Walker() }
+    }
 
     override fun draw(gc: pg) {
         walkers.forEach { w ->

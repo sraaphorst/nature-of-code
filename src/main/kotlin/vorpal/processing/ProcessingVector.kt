@@ -182,7 +182,7 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
             val Y = Vector2D(0.0, 1.0)
 
             fun random(min: Int, max: Int): Vector2D = Vector2D(pr.randomInt(min, max), pr.randomInt(min, max))
-            fun random(minX: Int, maxX: Int, minY: Int, maxY: Int): Vector2D = Vector2D(pr.randomInt(minX, maxX), pr.randomInt(minX, maxY))
+            fun random(minX: Int, maxX: Int, minY: Int, maxY: Int): Vector2D = Vector2D(pr.randomInt(minX, maxX), pr.randomInt(minY, maxY))
             fun random(max: Int): Vector2D = random(0, max)
             fun random(min: Double, max: Double) = Vector2D(pr.randomDouble(min, max), pr.randomDouble(min, max))
             fun random(max: Double): Vector2D = random(0.0, max)
