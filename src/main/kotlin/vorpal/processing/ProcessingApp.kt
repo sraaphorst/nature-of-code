@@ -13,8 +13,8 @@ var height: Double = 0.0
 
 abstract class ProcessingApp: Application() {
     private lateinit var canvas: Canvas
-    protected lateinit var gc: ProcessingGraphics
-    protected lateinit var stage: Stage
+    private lateinit var gc: ProcessingGraphics
+    private lateinit var stage: Stage
 
     fun createCanvas(w: Double, h: Double) {
         width = w
@@ -27,13 +27,18 @@ abstract class ProcessingApp: Application() {
         stage.title = title
     }
 
-    override fun start(stage: Stage) {
+    final override fun start(stage: Stage) {
         this.stage = stage
+        stage.title = "My Processing App"
+
+        // Perform any setup that needs to be done, including creating the canvas.
+        // TODO: Check what to do if we don't want a canvas or don't create one.
+        setup()
+
         val pane = Pane()
         pane.children.add(canvas)
         val scene = Scene(pane)
 
-        stage.title = "My Processing App"
         stage.scene = scene
         stage.show()
 
@@ -49,5 +54,7 @@ abstract class ProcessingApp: Application() {
         timer.start()
     }
 
+    // TODO: Probably want defaults that do nothing for these two functions, but have to handle canvas somehow.
+    abstract fun setup()
     abstract fun draw(gc: ProcessingGraphics)
 }

@@ -43,10 +43,8 @@ data class Walker(val color: Color = pg.randomColor(),
 class RandomWalkers(val numWalkers: Int = 6): ProcessingApp() {
     private var walkers: List<Walker> = emptyList()
 
-    override fun start(stage: Stage) {
-        // For now, we need to create the Canvas and call the superclass start to initialize the stage.
+    override fun setup() {
         createCanvas(1048.0, 512.0)
-        super.start(stage)
         setTitle("Random Walkers")
         walkers = (1..numWalkers).map { Walker() }
     }
