@@ -2,7 +2,6 @@ package org.vorpal.vorpal.chapter01
 
 import javafx.application.Application
 import javafx.scene.paint.Color
-import javafx.stage.Stage
 
 import vorpal.processing.ProcessingGraphics as pg
 import vorpal.processing.ProcessingRandom as pr
