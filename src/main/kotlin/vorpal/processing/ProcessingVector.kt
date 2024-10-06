@@ -5,6 +5,8 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 
 typealias Scalar = Double
+typealias Vector2D = ProcessingVector.Vector2D
+typealias Vector3D = ProcessingVector.Vector3D
 
 sealed interface ProcessingVector<T: ProcessingVector<T>> {
     val magnitude: Double

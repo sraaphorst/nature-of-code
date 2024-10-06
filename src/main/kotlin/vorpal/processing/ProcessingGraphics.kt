@@ -5,38 +5,44 @@ import vorpal.processing.ProcessingRandom as pr
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 
-class ProcessingGraphics(private val gc: GraphicsContext) {
-    fun fill(gray: Int, alpha: Int = 255) {
-        gc.fill = Color.grayRgb(gray, alpha / 255.0)
+class ProcessingGraphics(private val gc: GraphicsContext?) {
+    private inline fun withGC(action: GraphicsContext.() -> Unit) =
+        gc?.apply(action)
+
+    fun fill(gray: Int, alpha: Int = 255) = withGC {
+        fill = Color.grayRgb(gray, alpha / 255.0)
     }
 
-    fun stroke(color: Color) {
-        gc.stroke = color
+    fun stroke(color: Color) = withGC {
+        stroke = color
     }
 
-    fun stroke(gray: Int, alpha: Int = 255) {
-        gc.stroke = Color.grayRgb(gray, alpha / 255.0)
+    fun stroke(gray: Int, alpha: Int = 255) = withGC {
+        stroke = Color.grayRgb(gray, alpha / 255.0)
     }
 
-    fun strokeWeight(weight: Double) {
-        gc.lineWidth = weight
+    fun strokeWeight(weight: Double)  = withGC {
+        lineWidth = weight
     }
 
-    fun ellipse(x: Double, y: Double, width: Double, height: Double) {
-        gc.fillOval(x, y, width, height)
+    fun ellipse(x: Double, y: Double, width: Double, height: Double) = withGC {
+        fillOval(x, y, width, height)
     }
 
-    fun circle(x: Double, y: Double, diameter: Double) {
+    fun circle(x: Double, y: Double, diameter: Double) =
         ellipse(x, y, diameter, diameter)
+
+    fun point(x: Double, y: Double) = withGC {
+        strokeLine(x, y, x, y)
     }
 
-    fun point(x: Double, y: Double) {
-        gc.strokeLine(x, y, x, y)
+    fun background(gray: Int) = withGC {
+        fill = Color.grayRgb(gray)
+        fillRect(0.0, 0.0, canvas.width, canvas.height)
     }
 
-    fun background(gray: Int) {
-        gc.fill = Color.grayRgb(gray)
-        gc.fillRect(0.0, 0.0, gc.canvas.width, gc.canvas.height)
+    fun clear()  = withGC {
+        clearRect(0.0, 0.0, canvas.width, canvas.height)
     }
 
     companion object {

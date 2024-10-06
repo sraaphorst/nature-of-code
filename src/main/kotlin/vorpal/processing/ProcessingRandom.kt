@@ -3,6 +3,21 @@ package vorpal.processing
 import kotlin.math.*
 import kotlin.random.Random
 
+typealias Distribution<T> = ProcessingRandom.Distribution<T>
+typealias SizedDistribution<T> = ProcessingRandom.SizedDistribution<T>
+typealias UniformDoubleDistribution = ProcessingRandom.UniformDoubleDistribution
+typealias UniformIntDistribution = ProcessingRandom.UniformIntDistribution
+typealias GaussianDistribution = ProcessingRandom.GaussianDistribution
+typealias NonUniformDistribution<T> = ProcessingRandom.NonUniformDistribution<T>
+typealias CollectionWithReplacementDistribution<T> = ProcessingRandom.CollectionWithReplacementDistribution<T>
+typealias MutableCollectionDistribution<T> = ProcessingRandom.MutableCollectionDistribution<T>
+typealias ExponentialDistribution = ProcessingRandom.ExponentialDistribution
+typealias PoissonDistribution = ProcessingRandom.PoissonDistribution
+typealias BernoulliIntDistribution = ProcessingRandom.BernoulliIntDistribution
+typealias BinomialDistribution = ProcessingRandom.BinomialDistribution
+typealias BetaDistribution = ProcessingRandom.BetaDistribution
+typealias GammaDistribution = ProcessingRandom.GammaDistribution
+
 // Random functions that do not require a distribution.
 object ProcessingRandom {
     // Simplifications to avoid having to use actual distributions.
@@ -19,6 +34,21 @@ object ProcessingRandom {
 
     inline fun <reified T : Enum<T>> randomEnum(): T =
         enumValues<T>().random()
+
+    /**
+     * We don't want to have to instantiate a Gaussian distribution for every value chosen
+     * from a normal distribution, so while this is a bit redundant with the GaussianDistribution,
+     * we add the extension into Random for convenience.
+     */
+    fun Random.nextGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double {
+        // Use Box-Muller transform to generate Gaussian sample.
+        val u1 = Random.nextDouble()
+        val u2 = Random.nextDouble()
+        val z0 = sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2)
+        return z0 * stdev + mean
+    }
+
+    fun randomGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double = Random.nextGaussian(mean, stdev)
 
     /**
      * The accept-reject algorithm.
@@ -57,9 +87,16 @@ object ProcessingRandom {
     }
 
     /**
+     * Superclass for all distributions.
+     */
+    sealed interface Distribution<T> {
+        fun sample(): T
+    }
+
+    /**
      * A distribution with a finite number of elements.
      */
-    sealed interface SizedDistribution {
+    sealed interface SizedDistribution<T>: Distribution<T> {
         /**
          * The number of elements available in the distribution. If the distribution's contents
          * are changed by sampling or elements can be added, then size must reflect this.
@@ -67,15 +104,8 @@ object ProcessingRandom {
         fun size(): Int
     }
 
-    /**
-     * Superclass for all distributions.
-     */
-    sealed interface Distribution<T> {
-        fun sample(): T
-    }
-
     // Note that the bounds are [min, max), i.e. the upper bound is exclusive.
-    class UniformDoubleDistribution(val min: Double, val max: Double) : Distribution<Double> {
+    class UniformDoubleDistribution(val min: Double, val max: Double): Distribution<Double> {
         constructor(min: Number, max: Number) : this(min.toDouble(), max.toDouble())
         constructor(max: Number) : this(0.0, max.toDouble())
 
@@ -85,8 +115,9 @@ object ProcessingRandom {
     /**
      * A uniform discrete distribution that returns a value in the interval [min, max)
      */
-    class UniformIntDistribution(val min: Int, val max: Int) : Distribution<Int>, SizedDistribution {
+    class UniformIntDistribution(val min: Int, val max: Int): SizedDistribution<Int> {
         constructor(max: Int) : this(0, max)
+
         override fun sample(): Int = Random.nextInt(min, max)
         override fun size(): Int = max - min
     }
@@ -94,7 +125,7 @@ object ProcessingRandom {
     /**
      * A Gaussian / normal distribution with the specified mean and standard deviation.
      */
-    class GaussianDistribution(val mean: Double = 0.0, val stdev: Double = 1.0) : Distribution<Double> {
+    class GaussianDistribution(val mean: Double = 0.0, val stdev: Double = 1.0): Distribution<Double> {
         override fun sample(): Double = Random.nextGaussian() * stdev + mean
     }
 
@@ -102,7 +133,7 @@ object ProcessingRandom {
      * Given a map of objects and their relative probability of being selected (which does not
      * need to equal 1), determine the sum of the probabilities and considered them scaled to [0,1).
      */
-    class NonUniformDistribution<T>(values: Map<T, Double>) : Distribution<T>, SizedDistribution {
+    class NonUniformDistribution<T>(values: Map<T, Double>): SizedDistribution<T> {
         private val totalSum = values.values.sum()
         private val collection = values.toList()
         override fun sample(): T {
@@ -112,24 +143,27 @@ object ProcessingRandom {
             }
             return aux()
         }
+
         override fun size(): Int = collection.size
     }
 
     /**
      * Given a collection, sample from it with replacement.
      */
-    class CollectionWithReplacementDistribution<T>(collection: Collection<T>) : Distribution<T>, SizedDistribution {
+    class CollectionWithReplacementDistribution<T>(collection: Collection<T>): SizedDistribution<T> {
         private val elements = collection.toList()
         override fun sample(): T =
             elements.random()
+
         override fun size(): Int = elements.size
     }
 
     /**
      * Given a collection, sample from it without replacement. Elements can also be added to this distribution.
      */
-    class MutableCollectionDistribution<T>(val collection: Collection<T>) : Distribution<T>, SizedDistribution {
+    class MutableCollectionDistribution<T>(val collection: Collection<T>): SizedDistribution<T> {
         private val elements = collection.toMutableList()
+
         init {
             elements.shuffle()
         }
@@ -161,14 +195,14 @@ object ProcessingRandom {
      * Used for modelling time between events in a Poisson process, such as waiting times
      * in queueing systems or decay processes.
      */
-    class ExponentialDistribution(val rate: Double) : Distribution<Double> {
+    class ExponentialDistribution(val rate: Double): Distribution<Double> {
         override fun sample(): Double = -ln(Random.nextDouble()) / rate
     }
 
     /**
      * A discrete distribution used to model the number of events in a fixed interval of time or space.
      */
-    class PoissonDistribution(val lambda: Double = 1.0) : Distribution<Int> {
+    class PoissonDistribution(val lambda: Double = 1.0): Distribution<Int> {
         override fun sample(): Int {
             val l: Double = exp(-lambda)
 
@@ -187,7 +221,7 @@ object ProcessingRandom {
      * Equal to a coin toss if p = 0.5.
      * 1 if probability < p, and 0 otherwise.
      */
-    class BernoulliIntDistribution(val p: Double) : Distribution<Int>, SizedDistribution {
+    class BernoulliIntDistribution(val p: Double): SizedDistribution<Int> {
         override fun sample(): Int = if (Random.nextDouble() < p) 1 else 0
         override fun size(): Int = 2
     }
@@ -195,7 +229,7 @@ object ProcessingRandom {
     /**
      * A Bernouilli distribution that returns true or false instead of 1 or 0.
      */
-    class BernoulliBooleanDistribution(val p: Double) : Distribution<Boolean>, SizedDistribution {
+    class BernoulliBooleanDistribution(val p: Double): SizedDistribution<Boolean> {
         override fun sample(): Boolean = Random.nextDouble() < p
         override fun size(): Int = 2
     }
@@ -205,7 +239,7 @@ object ProcessingRandom {
      * Example: we roll a four sided die 10 times to see the number of times
      * a given number is rolled: we then initialize with n = 10, p = 0.25.
      */
-    class BinomialDistribution(val n: Int, val p: Double) : Distribution<Int>, SizedDistribution {
+    class BinomialDistribution(val n: Int, val p: Double): SizedDistribution<Int> {
         override fun sample(): Int = (1..n).count { Random.nextDouble() < p }
         override fun size(): Int = n + 1
     }
@@ -213,7 +247,7 @@ object ProcessingRandom {
     /**
      * Useful in Bayesian statistics and for modeling probabilities.
      */
-    class BetaDistribution(val alpha: Double, val beta: Double) : Distribution<Double> {
+    class BetaDistribution(val alpha: Double, val beta: Double): Distribution<Double> {
         private val gamma1 = GammaDistribution(alpha, 1.0)
         private val gamma2 = GammaDistribution(beta, 1.0)
 
@@ -229,7 +263,7 @@ object ProcessingRandom {
      * Example: in queueing theory, models the sum of multiple exponentially distributed random variables
      * (i.e. waiting times between independent events that occur at a constant average rate).
      */
-    class GammaDistribution(val alpha: Double, val beta: Double) : Distribution<Double> {
+    class GammaDistribution(val alpha: Double, val beta: Double): Distribution<Double> {
         override fun sample(): Double =
             when {
                 alpha > 1 -> marsagliaTsang()
@@ -257,18 +291,5 @@ object ProcessingRandom {
             }
         }
     }
-}
-
-/**
- * We don't want to have to instantiate a Gaussian distribution for every value chosen
- * from a normal distribution, so while this is a bit redundant with the GaussianDistribution,
- * we add the extension into Random for convenience.
- */
-fun Random.nextGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double {
-    // Use Box-Muller transform to generate Gaussian sample.
-    val u1 = Random.nextDouble()
-    val u2 = Random.nextDouble()
-    val z0 = sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2)
-    return z0 * stdev + mean
 }
 
