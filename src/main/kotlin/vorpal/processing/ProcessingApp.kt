@@ -12,15 +12,32 @@ var width: Double = 0.0
 var height: Double = 0.0
 
 abstract class ProcessingApp: Application() {
-    private lateinit var canvas: Canvas
+    /**
+     * By default, we have a 100x100 Canvas unless:
+     * 1. A Canvas is explicitly created with createCanvas; or
+     * 2. There is a deliberate specification of no Canvas with noCanvas.
+     */
+    private var canvas: Canvas? = null
+    private var noCanvasCalled: Boolean = false
     private lateinit var gc: ProcessingGraphics
     private lateinit var stage: Stage
 
     fun createCanvas(w: Double, h: Double) {
+        assert(w > 0) { "createCanvas($w,$h) has illegal width $w" }
+        assert(h > 0) { "createCanvas($w,$h) has illegal height $h" }
+        noCanvasCalled = false
         width = w
         height = h
         canvas = Canvas(width, height)
-        gc = ProcessingGraphics(canvas.graphicsContext2D)
+        gc = ProcessingGraphics(canvas!!.graphicsContext2D)
+    }
+
+    fun noCanvas() {
+        noCanvasCalled = true
+        width = 0.0
+        height = 0.0
+        canvas = null
+        gc = ProcessingGraphics(null)
     }
 
     fun setTitle(title: String) {
@@ -32,13 +49,16 @@ abstract class ProcessingApp: Application() {
         stage.title = "My Processing App"
 
         // Perform any setup that needs to be done, including creating the canvas.
-        // TODO: Check what to do if we don't want a canvas or don't create one.
         setup()
 
         val pane = Pane()
-        pane.children.add(canvas)
-        val scene = Scene(pane)
 
+        // Unless we explicitly call for no canvas, a canvas of 100x100 is called.
+        if (!noCanvasCalled && canvas == null)
+            createCanvas(100.0, 100.0)
+        canvas?.let { pane.children.add(it) }
+
+        val scene = Scene(pane)
         stage.scene = scene
         stage.show()
 
@@ -54,7 +74,15 @@ abstract class ProcessingApp: Application() {
         timer.start()
     }
 
-    // TODO: Probably want defaults that do nothing for these two functions, but have to handle canvas somehow.
-    abstract fun setup()
-    abstract fun draw(gc: ProcessingGraphics)
+    /**
+     * The default implementation of setup does nothing, which results in a 100x100 canvas.
+     */
+    open fun setup() {}
+
+    /**
+     * The default draw implementation does nothing. Note that if noCanvas is called, the
+     * ProcessingGraphics inside here ignores all calls since there is no Canvas on which
+     * to work.
+     */
+    open fun draw(gc: ProcessingGraphics) {}
 }
