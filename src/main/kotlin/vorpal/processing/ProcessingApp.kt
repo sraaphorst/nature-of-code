@@ -2,6 +2,7 @@ package vorpal.processing
 
 import javafx.animation.AnimationTimer
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.layout.Pane
@@ -22,12 +23,14 @@ abstract class ProcessingApp: Application() {
     private lateinit var gc: ProcessingGraphics
     private lateinit var stage: Stage
 
-    fun createCanvas(w: Double, h: Double) {
-        assert(w > 0) { "createCanvas($w,$h) has illegal width $w" }
-        assert(h > 0) { "createCanvas($w,$h) has illegal height $h" }
+    fun <T: Number> createCanvas(w: T, h: T) {
+        val wp = w.toDouble()
+        val hp = h.toDouble()
+        assert(wp > 0) { "createCanvas($w,$h) has illegal width $w" }
+        assert(hp > 0) { "createCanvas($w,$h) has illegal height $h" }
         noCanvasCalled = false
-        width = w
-        height = h
+        width = wp
+        height = hp
         canvas = Canvas(width, height)
         gc = ProcessingGraphics(canvas!!.graphicsContext2D)
     }
@@ -72,6 +75,12 @@ abstract class ProcessingApp: Application() {
 
         // Start the timer
         timer.start()
+    }
+
+    final override fun stop() {
+        super.stop()
+        Platform.exit()
+        System.exit(0)
     }
 
     /**

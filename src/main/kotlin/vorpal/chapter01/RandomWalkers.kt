@@ -1,4 +1,4 @@
-package org.vorpal.vorpal.chapter01
+package vorpal.chapter01
 
 import javafx.application.Application
 import javafx.scene.paint.Color
