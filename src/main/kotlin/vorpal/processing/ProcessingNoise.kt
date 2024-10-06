@@ -1,4 +1,4 @@
-package org.vorpal.vorpal.processing
+package vorpal.processing
 
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -757,3 +757,8 @@ class ProcessingNoise {
         }
     }
 }
+
+private val perlinNoise = ProcessingNoise.PerlinNoise()
+public fun noise(x: Double): Double = perlinNoise.noise(x)
+public fun noise(x: Double, y: Double): Double = perlinNoise.noise(x, y)
+public fun noise(x: Double, y: Double, z: Double) = perlinNoise.noise(x, y, z)

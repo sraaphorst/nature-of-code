@@ -3,6 +3,7 @@ package vorpal.processing
 typealias App = ProcessingApp
 typealias Graphics = ProcessingGraphics
 typealias Random = ProcessingRandom
+typealias Noise = ProcessingNoise
 
 
 //object Test {
