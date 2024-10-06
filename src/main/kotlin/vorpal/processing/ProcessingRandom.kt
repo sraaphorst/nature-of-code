@@ -26,7 +26,7 @@ object ProcessingRandom {
     fun randomInt(): Int = randomInt(Int.MIN_VALUE, Int.MAX_VALUE)
 
     fun randomDouble(min: Double, max: Double): Double = Random.nextDouble(min, max)
-    fun randomDouble(max: Double): Double = randomDouble(max)
+    fun randomDouble(max: Double): Double = randomDouble(0.0, max)
     fun randomDouble(): Double = randomDouble(Double.MIN_VALUE, Double.MAX_VALUE)
 
     fun <T> randomElement(elements: Collection<T>): T =

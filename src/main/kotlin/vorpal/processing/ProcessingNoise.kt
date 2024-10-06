@@ -201,7 +201,7 @@ class ProcessingNoise {
         }
     }
 
-    object SimplexNoise: Noise {
+    object SimplexNoise : Noise {
         // Simplex noise in 2D, 3D and 4D
         private val grad3 = arrayOf(
             Grad(1.0, 1.0, 0.0), Grad(-1.0, 1.0, 0.0), Grad(1.0, -1.0, 0.0), Grad(-1.0, -1.0, 0.0),
@@ -265,6 +265,7 @@ class ProcessingNoise {
 
         override fun noise(x: Double): Double =
             noise(x, 0.0)
+
         override fun noise(x: Double, y: Double): Double {
             val n0: Double
             val n1: Double
@@ -594,138 +595,140 @@ class ProcessingNoise {
                 this.w = w
             }
         }
+    }
 
-        class WorleyNoise(private val numFeaturePoints: Int = 1, private val seed: Int = 0) : Noise {
-            // Hashing function to generate pseudo-random values
-            private fun random(seed: Int, x: Int): Double {
-                val n = x * 374761393 + seed * 668265263
-                return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
+    class WorleyNoise(private val numFeaturePoints: Int = 1, private val seed: Int = 0) : Noise {
+        // Hashing function to generate pseudo-random values
+        private fun random(seed: Int, x: Int): Double {
+            val n = x * 374761393 + seed * 668265263
+            return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
+        }
+
+        private fun random(seed: Int, x: Int, y: Int): Double {
+            val n = x * 374761393 + y * 668265263 + seed * 1376312589
+            return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
+        }
+
+        private fun random(seed: Int, x: Int, y: Int, z: Int): Double {
+            val n = x * 374761393 + y * 668265263 + z * 1376312589 + seed * 123456789
+            return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
+        }
+
+        private fun random(seed: Int, x: Int, y: Int, z: Int, w: Int): Double {
+            val n = x * 374761393 + y * 668265263 + z * 1376312589 + w * 1577334179 + seed * 918273645
+            return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
+        }
+
+        // Worley noise for 1D
+        override fun noise(x: Double): Double {
+            val xi = x.toInt()
+            var minDist = Double.MAX_VALUE
+
+            for (dx in -1..1) {
+                val gridX = xi + dx
+                val featurePoint = gridX + random(seed, gridX)
+
+                val dist = abs(featurePoint - x)
+                minDist = kotlin.math.min(minDist, dist)
             }
 
-            private fun random(seed: Int, x: Int, y: Int): Double {
-                val n = x * 374761393 + y * 668265263 + seed * 1376312589
-                return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
-            }
+            return minDist
+        }
 
-            private fun random(seed: Int, x: Int, y: Int, z: Int): Double {
-                val n = x * 374761393 + y * 668265263 + z * 1376312589 + seed * 123456789
-                return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
-            }
+        // Worley noise for 2D
+        override fun noise(x: Double, y: Double): Double {
+            val xi = x.toInt()
+            val yi = y.toInt()
+            var minDist = Double.MAX_VALUE
 
-            private fun random(seed: Int, x: Int, y: Int, z: Int, w: Int): Double {
-                val n = x * 374761393 + y * 668265263 + z * 1376312589 + w * 1577334179 + seed * 918273645
-                return ((n xor (n shl 13)) * 1274126177 and 0x7fffffff).toDouble() / Int.MAX_VALUE.toDouble()
-            }
-
-            // Worley noise for 1D
-            override fun noise(x: Double): Double {
-                val xi = x.toInt()
-                var minDist = Double.MAX_VALUE
-
-                for (dx in -1..1) {
+            for (dx in -1..1) {
+                for (dy in -1..1) {
                     val gridX = xi + dx
-                    val featurePoint = gridX + random(seed, gridX)
+                    val gridY = yi + dy
 
-                    val dist = abs(featurePoint - x)
+                    // Random feature point in this grid cell
+                    val featureX = gridX + random(seed, gridX, gridY)
+                    val featureY = gridY + random(seed, gridX, gridY + 1)
+
+                    // Calculate distance to this feature point
+                    val dist = sqrt((featureX - x) * (featureX - x) + (featureY - y) * (featureY - y))
                     minDist = kotlin.math.min(minDist, dist)
                 }
-
-                return minDist
             }
 
-            // Worley noise for 2D
-            override fun noise(x: Double, y: Double): Double {
-                val xi = x.toInt()
-                val yi = y.toInt()
-                var minDist = Double.MAX_VALUE
+            return minDist
+        }
 
-                for (dx in -1..1) {
-                    for (dy in -1..1) {
+        // Worley noise for 3D
+        override fun noise(x: Double, y: Double, z: Double): Double {
+            val xi = x.toInt()
+            val yi = y.toInt()
+            val zi = z.toInt()
+            var minDist = Double.MAX_VALUE
+
+            for (dx in -1..1) {
+                for (dy in -1..1) {
+                    for (dz in -1..1) {
                         val gridX = xi + dx
                         val gridY = yi + dy
+                        val gridZ = zi + dz
 
                         // Random feature point in this grid cell
-                        val featureX = gridX + random(seed, gridX, gridY)
-                        val featureY = gridY + random(seed, gridX, gridY + 1)
+                        val featureX = gridX + random(seed, gridX, gridY, gridZ)
+                        val featureY = gridY + random(seed, gridX, gridY, gridZ + 1)
+                        val featureZ = gridZ + random(seed, gridX, gridY + 1, gridZ)
 
                         // Calculate distance to this feature point
-                        val dist = sqrt((featureX - x) * (featureX - x) + (featureY - y) * (featureY - y))
+                        val dist =
+                            sqrt((featureX - x) * (featureX - x) + (featureY - y) * (featureY - y) + (featureZ - z) * (featureZ - z))
                         minDist = kotlin.math.min(minDist, dist)
                     }
                 }
-
-                return minDist
             }
 
-            // Worley noise for 3D
-            override fun noise(x: Double, y: Double, z: Double): Double {
-                val xi = x.toInt()
-                val yi = y.toInt()
-                val zi = z.toInt()
-                var minDist = Double.MAX_VALUE
+            return minDist
+        }
 
-                for (dx in -1..1) {
-                    for (dy in -1..1) {
-                        for (dz in -1..1) {
+        // Worley noise for 4D
+        override fun noise(x: Double, y: Double, z: Double, w: Double): Double {
+            val xi = x.toInt()
+            val yi = y.toInt()
+            val zi = z.toInt()
+            val wi = w.toInt()
+            var minDist = Double.MAX_VALUE
+
+            for (dx in -1..1) {
+                for (dy in -1..1) {
+                    for (dz in -1..1) {
+                        for (dw in -1..1) {
                             val gridX = xi + dx
                             val gridY = yi + dy
                             val gridZ = zi + dz
+                            val gridW = wi + dw
 
                             // Random feature point in this grid cell
-                            val featureX = gridX + random(seed, gridX, gridY, gridZ)
-                            val featureY = gridY + random(seed, gridX, gridY, gridZ + 1)
-                            val featureZ = gridZ + random(seed, gridX, gridY + 1, gridZ)
+                            val featureX = gridX + random(seed, gridX, gridY, gridZ, gridW)
+                            val featureY = gridY + random(seed, gridX, gridY + 1, gridZ, gridW)
+                            val featureZ = gridZ + random(seed, gridX, gridY, gridZ + 1, gridW)
+                            val featureW = gridW + random(seed, gridX, gridY, gridZ, gridW + 1)
 
                             // Calculate distance to this feature point
-                            val dist = sqrt((featureX - x) * (featureX - x) + (featureY - y) * (featureY - y) + (featureZ - z) * (featureZ - z))
+                            val dist = sqrt(
+                                (featureX - x) * (featureX - x) +
+                                        (featureY - y) * (featureY - y) +
+                                        (featureZ - z) * (featureZ - z) +
+                                        (featureW - w) * (featureW - w)
+                            )
                             minDist = kotlin.math.min(minDist, dist)
                         }
                     }
                 }
-
-                return minDist
             }
 
-            // Worley noise for 4D
-            override fun noise(x: Double, y: Double, z: Double, w: Double): Double {
-                val xi = x.toInt()
-                val yi = y.toInt()
-                val zi = z.toInt()
-                val wi = w.toInt()
-                var minDist = Double.MAX_VALUE
-
-                for (dx in -1..1) {
-                    for (dy in -1..1) {
-                        for (dz in -1..1) {
-                            for (dw in -1..1) {
-                                val gridX = xi + dx
-                                val gridY = yi + dy
-                                val gridZ = zi + dz
-                                val gridW = wi + dw
-
-                                // Random feature point in this grid cell
-                                val featureX = gridX + random(seed, gridX, gridY, gridZ, gridW)
-                                val featureY = gridY + random(seed, gridX, gridY + 1, gridZ, gridW)
-                                val featureZ = gridZ + random(seed, gridX, gridY, gridZ + 1, gridW)
-                                val featureW = gridW + random(seed, gridX, gridY, gridZ, gridW + 1)
-
-                                // Calculate distance to this feature point
-                                val dist = sqrt(
-                                    (featureX - x) * (featureX - x) +
-                                            (featureY - y) * (featureY - y) +
-                                            (featureZ - z) * (featureZ - z) +
-                                            (featureW - w) * (featureW - w)
-                                )
-                                minDist = kotlin.math.min(minDist, dist)
-                            }
-                        }
-                    }
-                }
-
-                return minDist
-            }
+            return minDist
         }
     }
+
     companion object {
         private val permutation: IntArray = intArrayOf(
             151, 160, 137, 91, 90, 15,

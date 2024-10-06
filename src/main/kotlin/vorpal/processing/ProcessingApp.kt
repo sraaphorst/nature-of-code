@@ -2,6 +2,7 @@ package vorpal.processing
 
 import javafx.animation.AnimationTimer
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.canvas.Canvas
 import javafx.scene.layout.Pane
@@ -74,6 +75,12 @@ abstract class ProcessingApp: Application() {
 
         // Start the timer
         timer.start()
+    }
+
+    final override fun stop() {
+        super.stop()
+        Platform.exit()
+        System.exit(0)
     }
 
     /**
