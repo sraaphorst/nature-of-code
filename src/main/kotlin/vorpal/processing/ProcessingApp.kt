@@ -12,6 +12,10 @@ import javafx.stage.Stage
 var width: Double = 0.0
 var height: Double = 0.0
 
+// Global access to the mouse coordinates like in Processing.
+var mouseX: Double = 0.0
+var mouseY: Double = 0.0
+
 abstract class ProcessingApp: Application() {
     /**
      * By default, we have a 100x100 Canvas unless:
@@ -62,14 +66,21 @@ abstract class ProcessingApp: Application() {
         canvas?.let { pane.children.add(it) }
 
         val scene = Scene(pane)
+        scene.setOnMouseMoved { evt ->
+            mouseX = evt.x
+            mouseY = evt.y
+        }
+
         stage.scene = scene
         stage.show()
 
         // Create the AnimationTimer for continuous drawing
         val timer = object : AnimationTimer() {
             override fun handle(now: Long) {
+                gc.save()
                 // Call the draw method in each frame
                 draw(gc)
+                gc.restore()
             }
         }
 
@@ -93,5 +104,5 @@ abstract class ProcessingApp: Application() {
      * ProcessingGraphics inside here ignores all calls since there is no Canvas on which
      * to work.
      */
-    open fun draw(gc: ProcessingGraphics) {}
+    open fun draw(gc: Graphics) {}
 }
