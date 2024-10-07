@@ -3,20 +3,15 @@ package vorpal.chapter01
 import javafx.application.Application
 import vorpal.processing.*
 
+/**
+ * This class draws a vector to the mouse point, and then a thicker vector of magnitude 50 in the
+ * same direction.
+ */
 class Vector2: ProcessingApp() {
     override fun setup() {
         createCanvas(1000, 1000)
         setTitle("Vector2")
     }
-
-//    override fun draw(gc: Graphics) {
-//        gc.background(255)
-//        val mouse = Vector2D(mouseX, mouseY)
-//
-//        gc.stroke(200)
-//        gc.strokeWeight(4)
-//        gc.line(Vector2D.ZERO, mouse)
-//    }
 
     override fun draw(gc: Graphics) {
         gc.background(255)
