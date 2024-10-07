@@ -3,12 +3,26 @@ package vorpal.processing
 import kotlin.math.abs
 import kotlin.math.sqrt
 
+typealias UniformRandomNoise = ProcessingNoise.UniformRandomNoise
+typealias PerlinNoise = ProcessingNoise.PerlinNoise
+typealias SimplexNoise = ProcessingNoise.SimplexNoise
+typealias WorleyNoise = ProcessingNoise.WorleyNoise
+
 class ProcessingNoise {
     sealed interface Noise {
         fun noise(x: Double): Double
         fun noise(x: Double, y: Double): Double
         fun noise(x: Double, y: Double, z: Double): Double
         fun noise(x: Double, y: Double, z: Double, w: Double): Double
+    }
+
+    // This could be an object but to treat Noise uniformly, we make it into a class.
+    class UniformRandomNoise : Noise {
+        private val dist = ProcessingRandom.UniformDoubleDistribution(-1.0, 1.0)
+        override fun noise(x: Double): Double = dist.sample()
+        override fun noise(x: Double, y: Double): Double = dist.sample()
+        override fun noise(x: Double, y: Double, z: Double): Double = dist.sample()
+        override fun noise(x: Double, y: Double, z: Double, w: Double): Double = dist.sample()
     }
 
     // Use repeats instead of repeat because repeat is a Kotlin keyword.
@@ -201,7 +215,8 @@ class ProcessingNoise {
         }
     }
 
-    object SimplexNoise : Noise {
+    // This could be an object but to treat Noise uniformly, we make it into a class.
+    class SimplexNoise : Noise {
         // Simplex noise in 2D, 3D and 4D
         private val grad3 = arrayOf(
             Grad(1.0, 1.0, 0.0), Grad(-1.0, 1.0, 0.0), Grad(1.0, -1.0, 0.0), Grad(-1.0, -1.0, 0.0),
@@ -249,8 +264,8 @@ class ProcessingNoise {
         // Skewing and unskewing factors for 2, 3, and 4 dimensions.
         private val F2 = 0.5 * (sqrt(3.0) - 1.0)
         private val G2 = (3.0 - sqrt(3.0)) / 6.0
-        private const val F3 = 1.0 / 3.0
-        private const val G3 = 1.0 / 6.0
+        private val F3 = 1.0 / 3.0
+        private val G3 = 1.0 / 6.0
         private val F4 = (sqrt(5.0) - 1.0) / 4.0
         private val G4 = (5.0 - sqrt(5.0)) / 20.0
 

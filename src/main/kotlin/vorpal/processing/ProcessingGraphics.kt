@@ -1,7 +1,5 @@
 package vorpal.processing
 
-import vorpal.processing.ProcessingRandom as pr
-
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 
@@ -47,6 +45,6 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
 
     companion object {
         fun randomColor(): Color =
-            Color.rgb(pr.randomInt(0xFF), pr.randomInt(0xFF), pr.randomInt(0xFF))
+            Color.rgb(randomInt(0xFF), randomInt(0xFF), randomInt(0xFF))
     }
 }
