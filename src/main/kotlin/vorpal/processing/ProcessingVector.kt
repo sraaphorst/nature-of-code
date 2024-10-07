@@ -67,6 +67,8 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
         else -> this as T
     }
 
+    fun setMagnitude(mag: Number): T = normalized * mag.toDouble()
+
     /**
      * Hadamard product: multiplication of pairwise elements.
      */
@@ -152,6 +154,9 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
         fun bounceX(): Vector2D = Vector2D(-x, y)
         fun bounceY(): Vector2D = Vector2D(x, -y)
 
+        fun withX(newX: Number): Vector2D = Vector2D(newX, y)
+        fun withY(newY: Number): Vector2D = Vector2D(x, newY)
+
         /**
          * In 2D space, we can find a perpendicular vector.
          * Note that the dot product of x * perpendicular(x) will always be 0.
@@ -184,6 +189,26 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
             val ZERO = Vector2D(0.0, 0.0)
             val X = Vector2D(1.0, 0.0)
             val Y = Vector2D(0.0, 1.0)
+
+            /**
+             * A vector with the mouse coordinates in it for convenience.
+             */
+            fun mouse(): Vector2D = Vector2D(mouseX, mouseY)
+
+            /**
+             * Coordinates vector: size of canvas.
+             */
+            fun canvas(): Vector2D = Vector2D(width, height)
+
+            /**
+             * Halfway point in the canvas, for convenience.
+             */
+            fun halfCanvas(): Vector2D = Vector2D(width / 2, height / 2)
+
+            /**
+             * This function creates a unit vector pointing in a random direction.
+             */
+            fun random(): Vector2D = Vector2D(randomDouble(-1, 1), randomDouble(-1, 1)).normalized
 
             fun random(min: Int, max: Int): Vector2D = Vector2D(randomInt(min, max), randomInt(min, max))
             fun random(minX: Number, maxX: Number, minY: Number, maxY: Number): Vector2D = Vector2D(randomDouble(minX.toDouble(), maxX.toDouble()), randomDouble(minY.toDouble(), maxY.toDouble()))

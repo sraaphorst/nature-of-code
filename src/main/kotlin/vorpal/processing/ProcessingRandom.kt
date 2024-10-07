@@ -232,8 +232,8 @@ fun randomInt(min: Int, max: Int): Int = Random.nextInt(min, max)
 fun randomInt(max: Int): Int = Random.nextInt(0, max)
 fun randomInt(): Int = randomInt(Int.MIN_VALUE, Int.MAX_VALUE)
 
-fun randomDouble(min: Double, max: Double): Double = Random.nextDouble(min, max)
-fun randomDouble(max: Double): Double = randomDouble(0.0, max)
+fun randomDouble(min: Number, max: Number): Double = Random.nextDouble(min.toDouble(), max.toDouble())
+fun randomDouble(max: Number): Double = randomDouble(0.0, max)
 fun randomDouble(): Double = randomDouble(Double.MIN_VALUE, Double.MAX_VALUE)
 
 fun <T> randomElement(elements: Collection<T>): T =
