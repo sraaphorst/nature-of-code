@@ -2,17 +2,15 @@ package vorpal.processing
 
 import kotlin.math.PI
 
-object ProcessingMath {
-    // Given a value d in the range [a, b], convert it to d' in the range [u, v].
-    // This must obviously be a Double in result because the ratios are unlikely to be Ints. )
-    fun <T: Number, W: Number> remap(d: T, a: T, b: T, u: W, v: W): Double {
-        val dD = d.toDouble()
-        val aD = a.toDouble()
-        val bD = b.toDouble()
-        val uD = u.toDouble()
-        val vD = v.toDouble()
-        return (dD - aD) * (vD - uD) / (bD - aD) * (vD - aD) + uD
-    }
+// Given a value d in the range [a, b], convert it to d' in the range [u, v].
+// This must obviously be a Double in result because the ratios are unlikely to be Ints. )
+fun <T: Number, W: Number> remap(d: T, a: T, b: T, u: W, v: W): Double {
+    val dD = d.toDouble()
+    val aD = a.toDouble()
+    val bD = b.toDouble()
+    val uD = u.toDouble()
+    val vD = v.toDouble()
+    return (dD - aD) * (vD - uD) / (bD - aD) * (vD - aD) + uD
 }
 
 data class Angle(val value: Double, val unit: AngleUnit) {
