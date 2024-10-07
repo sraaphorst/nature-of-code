@@ -10,7 +10,7 @@ import vorpal.processing.*
  * 2, Random acceleration.
  * 3. Acceleration chasing the mouse cursor.
  */
-class Mover(var position: Vector2D = Vector2D(width / 2, height / 2),
+class Mover(var position: Vector2D = Vector2D.halfCanvas(),
             var velocity: Vector2D = Vector2D.ZERO,
             val accelerationFn: () -> Vector2D = { Vector2D.ZERO },
             val topSpeed: Double = 3.0,
