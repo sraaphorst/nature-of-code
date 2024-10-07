@@ -12,9 +12,10 @@ import javafx.stage.Stage
 var width: Double = 0.0
 var height: Double = 0.0
 
-// Global access to the mouse coordinates like in Processing.
+// Global access to the mouse coordinates and status like in Processing.
 var mouseX: Double = 0.0
 var mouseY: Double = 0.0
+var mouseIsPressed: Boolean = false
 
 abstract class ProcessingApp: Application() {
     /**
@@ -70,10 +71,14 @@ abstract class ProcessingApp: Application() {
         canvas?.let { pane.children.add(it) }
 
         val scene = Scene(pane)
+
+        // Mouse handlers
         scene.setOnMouseMoved { evt ->
             mouseX = evt.x
             mouseY = evt.y
         }
+        scene.setOnMousePressed { mouseIsPressed = true }
+        scene.setOnMouseReleased { mouseIsPressed = false }
 
         stage.scene = scene
         stage.show()
