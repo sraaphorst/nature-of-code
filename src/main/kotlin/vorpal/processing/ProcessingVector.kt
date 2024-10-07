@@ -149,6 +149,9 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
         override operator fun div(scalar: Number): Vector2D = Vector2D(x / scalar.toDouble(), y / scalar.toDouble())
         override fun dot(other: Vector2D): Double = x * other.x + y * other.y
 
+        fun bounceX(): Vector2D = Vector2D(-x, y)
+        fun bounceY(): Vector2D = Vector2D(x, -y)
+
         /**
          * In 2D space, we can find a perpendicular vector.
          * Note that the dot product of x * perpendicular(x) will always be 0.
@@ -183,7 +186,7 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
             val Y = Vector2D(0.0, 1.0)
 
             fun random(min: Int, max: Int): Vector2D = Vector2D(randomInt(min, max), randomInt(min, max))
-            fun random(minX: Int, maxX: Int, minY: Int, maxY: Int): Vector2D = Vector2D(randomInt(minX, maxX), randomInt(minY, maxY))
+            fun random(minX: Number, maxX: Number, minY: Number, maxY: Number): Vector2D = Vector2D(randomDouble(minX.toDouble(), maxX.toDouble()), randomDouble(minY.toDouble(), maxY.toDouble()))
             fun random(max: Int): Vector2D = random(0, max)
             fun random(min: Double, max: Double) = Vector2D(randomDouble(min, max), randomDouble(min, max))
             fun random(max: Double): Vector2D = random(0.0, max)

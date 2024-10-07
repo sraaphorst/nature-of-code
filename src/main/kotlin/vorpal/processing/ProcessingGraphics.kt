@@ -7,6 +7,10 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
     private inline fun withGC(action: GraphicsContext.() -> Unit) =
         gc?.apply(action)
 
+    fun fill(r: Number, g: Number, b: Number) = withGC {
+        fill = Color.rgb(r.toInt(), g.toInt(), b.toInt())
+    }
+
     fun fill(gray: Int, alpha: Int = 255) = withGC {
         fill = Color.grayRgb(gray, alpha / 255.0)
     }
@@ -19,19 +23,19 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
         stroke = Color.grayRgb(gray, alpha / 255.0)
     }
 
-    fun strokeWeight(weight: Double)  = withGC {
-        lineWidth = weight
+    fun strokeWeight(weight: Number)  = withGC {
+        lineWidth = weight.toDouble()
     }
 
-    fun ellipse(x: Double, y: Double, width: Double, height: Double) = withGC {
-        fillOval(x, y, width, height)
+    fun ellipse(x: Number, y: Number, width: Number, height: Number) = withGC {
+        fillOval(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
     }
 
-    fun circle(x: Double, y: Double, diameter: Double) =
-        ellipse(x, y, diameter, diameter)
+    fun circle(x: Number, y: Number, diameter: Number) =
+        ellipse(x.toDouble(), y.toDouble(), diameter.toDouble(), diameter.toDouble())
 
-    fun point(x: Double, y: Double) = withGC {
-        strokeLine(x, y, x, y)
+    fun point(x: Number, y: Number) = withGC {
+        strokeLine(x.toDouble(), y.toDouble(), x.toDouble(), y.toDouble())
     }
 
     fun background(gray: Int) = withGC {
