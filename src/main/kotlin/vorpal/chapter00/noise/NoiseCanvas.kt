@@ -1,4 +1,4 @@
-package vorpal.chapter01
+package vorpal.chapter00.noise
 
 import javafx.scene.paint.Color
 import vorpal.processing.*
@@ -20,7 +20,7 @@ abstract class NoiseCanvas(val noiseType: ProcessingNoise.Noise?,
                 val z = noiseType
                     ?.noise(w * scale, h * scale, t)
                     ?.let { ((it + 1) / 2.0).coerceIn(0.0, 1.0) }
-                    ?: Random.randomDouble(1.0)
+                    ?: randomDouble(1.0)
                 val c = Color.gray(z)
                 gc.stroke(c)
                 gc.point(w.toDouble(), h.toDouble())

@@ -1,6 +1,5 @@
 package vorpal.processing
 
-import vorpal.processing.ProcessingRandom as pr
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -114,21 +113,21 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
             val Z = Vector3D(0.0, 0.0, 1.0)
 
             fun random(min: Int, max: Int): Vector3D =
-                Vector3D(pr.randomInt(min, max), pr.randomInt(min, max), pr.randomInt(min, max))
+                Vector3D(randomInt(min, max), randomInt(min, max), randomInt(min, max))
 
             fun random(max: Int): Vector3D = random(0, max)
             fun random(min: Double, max: Double) =
-                Vector3D(pr.randomDouble(min, max), pr.randomDouble(min, max), pr.randomDouble(min, max))
+                Vector3D(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max))
 
             fun random(max: Double): Vector3D = random(0.0, max)
             fun random(
-                dx: pr.Distribution<Double>,
-                dy: pr.Distribution<Double>,
-                dz: pr.Distribution<Double>
+                dx: Distribution<Double>,
+                dy: Distribution<Double>,
+                dz: Distribution<Double>
             ) =
                 Vector3D(dx.sample(), dy.sample(), dz.sample())
 
-            fun random(d: pr.Distribution<Double>): Vector3D = random(d, d, d)
+            fun random(d: Distribution<Double>): Vector3D = random(d, d, d)
         }
     }
 
@@ -183,14 +182,14 @@ sealed interface ProcessingVector<T: ProcessingVector<T>> {
             val X = Vector2D(1.0, 0.0)
             val Y = Vector2D(0.0, 1.0)
 
-            fun random(min: Int, max: Int): Vector2D = Vector2D(pr.randomInt(min, max), pr.randomInt(min, max))
-            fun random(minX: Int, maxX: Int, minY: Int, maxY: Int): Vector2D = Vector2D(pr.randomInt(minX, maxX), pr.randomInt(minY, maxY))
+            fun random(min: Int, max: Int): Vector2D = Vector2D(randomInt(min, max), randomInt(min, max))
+            fun random(minX: Int, maxX: Int, minY: Int, maxY: Int): Vector2D = Vector2D(randomInt(minX, maxX), randomInt(minY, maxY))
             fun random(max: Int): Vector2D = random(0, max)
-            fun random(min: Double, max: Double) = Vector2D(pr.randomDouble(min, max), pr.randomDouble(min, max))
+            fun random(min: Double, max: Double) = Vector2D(randomDouble(min, max), randomDouble(min, max))
             fun random(max: Double): Vector2D = random(0.0, max)
-            fun random(dx: pr.Distribution<Double>, dy: pr.Distribution<Double>) =
+            fun random(dx: Distribution<Double>, dy: Distribution<Double>) =
                 Vector2D(dx.sample(), dy.sample())
-            fun random(d: pr.Distribution<Double>): Vector2D = random(d, d)
+            fun random(d: Distribution<Double>): Vector2D = random(d, d)
         }
     }
 }

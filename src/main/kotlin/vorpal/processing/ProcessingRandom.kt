@@ -20,72 +20,6 @@ typealias GammaDistribution = ProcessingRandom.GammaDistribution
 
 // Random functions that do not require a distribution.
 object ProcessingRandom {
-    // Simplifications to avoid having to use actual distributions.
-    fun randomInt(min: Int, max: Int): Int = Random.nextInt(min, max)
-    fun randomInt(max: Int): Int = Random.nextInt(0, max)
-    fun randomInt(): Int = randomInt(Int.MIN_VALUE, Int.MAX_VALUE)
-
-    fun randomDouble(min: Double, max: Double): Double = Random.nextDouble(min, max)
-    fun randomDouble(max: Double): Double = randomDouble(0.0, max)
-    fun randomDouble(): Double = randomDouble(Double.MIN_VALUE, Double.MAX_VALUE)
-
-    fun <T> randomElement(elements: Collection<T>): T =
-        elements.random()
-
-    inline fun <reified T : Enum<T>> randomEnum(): T =
-        enumValues<T>().random()
-
-    /**
-     * We don't want to have to instantiate a Gaussian distribution for every value chosen
-     * from a normal distribution, so while this is a bit redundant with the GaussianDistribution,
-     * we add the extension into Random for convenience.
-     */
-    fun Random.nextGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double {
-        // Use Box-Muller transform to generate Gaussian sample.
-        val u1 = Random.nextDouble()
-        val u2 = Random.nextDouble()
-        val z0 = sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2)
-        return z0 * stdev + mean
-    }
-
-    fun randomGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double = Random.nextGaussian(mean, stdev)
-
-    /**
-     * The accept-reject algorithm.
-     *
-     * We want an algorithm that picks a value, and the value itself determines the
-     * probability of it being picked. Large values are more likely to be picked most
-     * of the time, and small values are less likely. We pick a value and then either
-     * accept it or reject it based on what the value is, which can be picked from
-     * any probabilistic distribution. It is a Monte Carlo method.
-     *
-     * proposal: The distribution of the proposal (T can be any type)
-     * acceptanceCriterion: Function to compute acceptance probability (must return Double)
-     *
-     * By default, we use a uniform double distribution [0.0, 1.0) and accept each value according to
-     * the probability associated with it, so:
-     * 0.1 has a 10% chance of acceptance
-     * * 0.9 has a 90% chance of acceptance
-     */
-    fun <T> acceptReject(
-        proposal: Distribution<T> = UniformDoubleDistribution(1, 0) as Distribution<T>,
-        acceptanceCriterion: (T) -> Double = { r1 -> (r1 as Double) }
-    ): T {
-        while (true) {
-            // Get sample from proposal distribution.
-            val r1 = proposal.sample()
-
-            // Compute the acceptance probability as a Double.
-            val p = acceptanceCriterion(r1)
-
-            // Calculate a uniform random number to determine acceptance.
-            val r2 = Random.nextDouble(1.0)
-
-            // If we accept it, then return it. Otherwise, continue.
-            if (r2 < p) return r1
-        }
-    }
-
     /**
      * Superclass for all distributions.
      */
@@ -293,3 +227,68 @@ object ProcessingRandom {
     }
 }
 
+// Simplifications to avoid having to use actual distributions.
+fun randomInt(min: Int, max: Int): Int = Random.nextInt(min, max)
+fun randomInt(max: Int): Int = Random.nextInt(0, max)
+fun randomInt(): Int = randomInt(Int.MIN_VALUE, Int.MAX_VALUE)
+
+fun randomDouble(min: Double, max: Double): Double = Random.nextDouble(min, max)
+fun randomDouble(max: Double): Double = randomDouble(0.0, max)
+fun randomDouble(): Double = randomDouble(Double.MIN_VALUE, Double.MAX_VALUE)
+
+fun <T> randomElement(elements: Collection<T>): T =
+    elements.random()
+
+inline fun <reified T : Enum<T>> randomEnum(): T =
+    enumValues<T>().random()
+
+/**
+ * We don't want to have to instantiate a Gaussian distribution for every value chosen
+ * from a normal distribution, so while this is a bit redundant with the GaussianDistribution,
+ * we add the extension into Random for convenience.
+ */
+fun Random.nextGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double {
+    // Use Box-Muller transform to generate Gaussian sample.
+    val u1 = Random.nextDouble()
+    val u2 = Random.nextDouble()
+    val z0 = sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2)
+    return z0 * stdev + mean
+}
+
+fun randomGaussian(mean: Double = 0.0, stdev: Double = 1.0): Double = Random.nextGaussian(mean, stdev)
+
+/**
+ * The accept-reject algorithm.
+ *
+ * We want an algorithm that picks a value, and the value itself determines the
+ * probability of it being picked. Large values are more likely to be picked most
+ * of the time, and small values are less likely. We pick a value and then either
+ * accept it or reject it based on what the value is, which can be picked from
+ * any probabilistic distribution. It is a Monte Carlo method.
+ *
+ * proposal: The distribution of the proposal (T can be any type)
+ * acceptanceCriterion: Function to compute acceptance probability (must return Double)
+ *
+ * By default, we use a uniform double distribution [0.0, 1.0) and accept each value according to
+ * the probability associated with it, so:
+ * 0.1 has a 10% chance of acceptance
+ * * 0.9 has a 90% chance of acceptance
+ */
+fun <T> acceptReject(
+    proposal: Distribution<T> = UniformDoubleDistribution(1, 0) as Distribution<T>,
+    acceptanceCriterion: (T) -> Double = { r1 -> (r1 as Double) }
+): T {
+    while (true) {
+        // Get sample from proposal distribution.
+        val r1 = proposal.sample()
+
+        // Compute the acceptance probability as a Double.
+        val p = acceptanceCriterion(r1)
+
+        // Calculate a uniform random number to determine acceptance.
+        val r2 = Random.nextDouble(1.0)
+
+        // If we accept it, then return it. Otherwise, continue.
+        if (r2 < p) return r1
+    }
+}

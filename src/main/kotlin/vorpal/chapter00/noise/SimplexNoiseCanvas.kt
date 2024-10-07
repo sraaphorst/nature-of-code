@@ -1,9 +1,9 @@
-package vorpal.chapter01
+package vorpal.chapter00.noise
 
 import javafx.application.Application
 import vorpal.processing.*
 
-class SimplexNoiseCanvas: NoiseCanvas(ProcessingNoise.SimplexNoise, "Simplex")
+class SimplexNoiseCanvas: NoiseCanvas(SimplexNoise(), "Simplex")
 
 fun main() {
     Application.launch(SimplexNoiseCanvas::class.java)

@@ -1,4 +1,4 @@
-package vorpal.chapter01
+package vorpal.chapter00.walkers
 
 import javafx.application.Application
 import javafx.scene.paint.Color
@@ -15,7 +15,7 @@ data class Walker(val color: Color = Graphics.randomColor(),
 
     // Make the walker take a step.
     fun step() {
-        pos += Random.randomEnum<Steps>().delta
+        pos += randomEnum<Steps>().delta
 
         // Wrap around.
         if (pos.x >= width) pos = Vector2D(0, pos.y)
