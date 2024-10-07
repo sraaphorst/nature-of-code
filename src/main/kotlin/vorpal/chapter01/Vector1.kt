@@ -5,7 +5,6 @@ import vorpal.processing.*
 
 class Vector1(diameter: Number = 48): ProcessingApp() {
     private val d: Double = diameter.toDouble()
-    private val r: Double = d / 2.0
     private var t: Double = 0.0
 
     private lateinit var position: Vector2D

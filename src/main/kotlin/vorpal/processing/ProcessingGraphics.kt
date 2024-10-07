@@ -38,6 +38,14 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
         strokeLine(x.toDouble(), y.toDouble(), x.toDouble(), y.toDouble())
     }
 
+    fun line(startX: Number, startY: Number, endX: Number, endY: Number) = withGC {
+        strokeLine(startX.toDouble(), startY.toDouble(), endX.toDouble(), endY.toDouble())
+    }
+
+    fun line(from: Vector2D, to: Vector2D) = withGC {
+        strokeLine(from.x, from.y, to.x, to.y)
+    }
+
     fun background(gray: Int) = withGC {
         fill = Color.grayRgb(gray)
         fillRect(0.0, 0.0, canvas.width, canvas.height)
@@ -45,6 +53,18 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
 
     fun clear()  = withGC {
         clearRect(0.0, 0.0, canvas.width, canvas.height)
+    }
+
+    fun translate(x: Number, y: Number) = withGC {
+        translate(x.toDouble(), y.toDouble())
+    }
+
+    fun save() = withGC {
+        save()
+    }
+
+    fun restore() = withGC {
+        restore()
     }
 
     companion object {
