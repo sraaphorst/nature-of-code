@@ -59,6 +59,10 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
         translate(x.toDouble(), y.toDouble())
     }
 
+    fun translate(vector: Vector2D) = withGC {
+        translate(vector.x, vector.y)
+    }
+
     fun save() = withGC {
         save()
     }

@@ -27,6 +27,10 @@ abstract class ProcessingApp: Application() {
     private lateinit var gc: ProcessingGraphics
     private lateinit var stage: Stage
 
+    final override fun init() {
+        super.init()
+    }
+
     fun <T: Number> createCanvas(w: T, h: T) {
         val wp = w.toDouble()
         val hp = h.toDouble()

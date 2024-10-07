@@ -15,10 +15,9 @@ class Vector2: ProcessingApp() {
 
     override fun draw(gc: Graphics) {
         gc.background(255)
-        val center = Vector2D(width / 2, height / 2)
-        val mouse = Vector2D(mouseX, mouseY) - center
+        val mouse = Vector2D.mouse() - Vector2D.halfCanvas()
 
-        gc.translate(width / 2, height / 2)
+        gc.translate(Vector2D.halfCanvas())
         gc.stroke(200)
         gc.line(0, 0, mouse.x, mouse.y)
 
