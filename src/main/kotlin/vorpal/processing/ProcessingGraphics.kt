@@ -7,6 +7,10 @@ class ProcessingGraphics(private val gc: GraphicsContext?) {
     private inline fun withGC(action: GraphicsContext.() -> Unit) =
         gc?.apply(action)
 
+    fun fill(r: Number, g: Number, b: Number) = withGC {
+        fill = Color.rgb(r.toInt(), g.toInt(), b.toInt())
+    }
+
     fun fill(gray: Int, alpha: Int = 255) = withGC {
         fill = Color.grayRgb(gray, alpha / 255.0)
     }
